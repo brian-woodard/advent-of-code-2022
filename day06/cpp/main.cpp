@@ -43,22 +43,33 @@ TBuffer ReadEntireFile(const char* FileName)
    return Result;
 }
 
-const int MARKER_SIZE = 4;
+const int START_PACKET_SIZE = 4;
+const int START_MESSAGE_SIZE = 14;
 
-bool StartOfPacket(char* Marker)
+bool StartOf(char* Data, int Size)
 {
-   bool result = false;
+   bool result = true;
 
-   result = (Marker[0] != Marker[1]) &&
-            (Marker[0] != Marker[2]) &&
-            (Marker[0] != Marker[3]) &&
-            (Marker[1] != Marker[2]) &&
-            (Marker[1] != Marker[3]) &&
-            (Marker[2] != Marker[3]) &&
-            (Marker[0] != 0) &&
-            (Marker[1] != 0) &&
-            (Marker[2] != 0) &&
-            (Marker[3] != 0);
+   for (int i = 0; i < Size; i++)
+   {
+      if (Data[i] == 0)
+      {
+         result = false;
+         break;
+      }
+
+      for (int j = i+1; j < Size; j++)
+      {
+         if (Data[i] == Data[j])
+         {
+            result = false;
+            break;
+         }
+      }
+
+      if (!result)
+         break;
+   }
 
    return result;
 }
@@ -66,26 +77,26 @@ bool StartOfPacket(char* Marker)
 int main()
 {
    TBuffer file = ReadEntireFile("../input.txt");
-   char marker[MARKER_SIZE] = {};
+   char start_of_packet[START_MESSAGE_SIZE] = {};
    int byte_offset = 0;
 
    if (file.Count)
    {
-      int marker_idx = 0;
+      int idx = 0;
 
       for (int i = 0; i < file.Count; i++)
       {
-         marker[marker_idx] = file.Data[i];
+         start_of_packet[idx] = file.Data[i];
 
-         if (StartOfPacket(marker))
+         if (StartOf(start_of_packet, START_MESSAGE_SIZE))
          {
             byte_offset = i++;
             break;
          }
 
-         marker_idx = (marker_idx + 1) % MARKER_SIZE;
+         idx = (idx + 1) % START_MESSAGE_SIZE;
       }
-   }
 
-   printf("Marker found at byte offset %d\n", byte_offset+1);
+      printf("Marker found at byte offset %d\n", byte_offset+1);
+   }
 }
