@@ -116,7 +116,7 @@ int main()
    uint64_t    start_index = 0;
    uint64_t    end_index = 0;
    uint64_t    commands = 0;
-   TBuffer     file = ReadEntireFile("../test.txt");
+   TBuffer     file = ReadEntireFile("../input.txt");
 
    // parse input
    while (end_index < file.Count)
