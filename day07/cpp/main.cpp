@@ -4,7 +4,9 @@
 #include <memory.h>
 #include <sys/stat.h>
 
-#define MAX_DIR_SIZE 256
+#define MAX_DIR_SIZE          256
+#define MAX_DISK_SPACE        70000000
+#define DISK_SPACE_FOR_UPDATE 30000000
 
 struct TBuffer
 {
@@ -96,6 +98,20 @@ void PrintDirectory(TDirectory* Directory)
    for (int i = 0; i < Directory->NumChildren; i++)
    {
       PrintDirectory(&Directory->Children[i]);
+   }
+}
+
+void FindSmallestDir(TDirectory* Directory, int64_t MinimumSize, int64_t* CurrMaximumSize, TDirectory** DirToDelete)
+{
+   for (int i = 0; i < Directory->NumChildren; i++)
+   {
+      FindSmallestDir(&Directory->Children[i], MinimumSize, CurrMaximumSize, DirToDelete);
+   }
+
+   if (Directory->Size >= MinimumSize && Directory->Size < *CurrMaximumSize)
+   {
+      *CurrMaximumSize = Directory->Size;
+      *DirToDelete = Directory;
    }
 }
 
@@ -268,14 +284,36 @@ int main()
 
    if (root)
    {
+      uint64_t free_space;
+      int64_t  space_needed;;
+
       printf("root = %p\n", root);
 
       root->Size = CalculateSizes(root);
 
       PrintDirectory(root);
 
+      // part 1
       uint64_t size = SmallDirSize(root);
       printf("size = %ld\n", size);
+
+      // part 2
+      free_space = MAX_DISK_SPACE - root->Size;
+      printf("free size = %ld\n", free_space);
+
+      space_needed = DISK_SPACE_FOR_UPDATE - (int64_t)free_space;
+      if (space_needed > 0)
+      {
+         TDirectory* directory_to_delete = nullptr;
+         int64_t     curr_max_size       = MAX_DISK_SPACE;
+
+         printf("space needed = %d\n", space_needed);
+         FindSmallestDir(root, space_needed, &curr_max_size, &directory_to_delete);
+
+         printf("delete directory %s to free %d space\n",
+                directory_to_delete->DirName,
+                directory_to_delete->Size);
+      }
 
       Cleanup(root);
 
