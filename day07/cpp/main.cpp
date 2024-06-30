@@ -310,9 +310,12 @@ int main()
          printf("space needed = %d\n", space_needed);
          FindSmallestDir(root, space_needed, &curr_max_size, &directory_to_delete);
 
-         printf("delete directory %s to free %d space\n",
-                directory_to_delete->DirName,
-                directory_to_delete->Size);
+         if (directory_to_delete)
+         {
+            printf("delete directory %s to free %d space\n",
+                   directory_to_delete->DirName,
+                   directory_to_delete->Size);
+         }
       }
 
       Cleanup(root);
