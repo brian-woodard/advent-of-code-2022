@@ -163,10 +163,10 @@ public:
          index = mHashFn(Key) % mBucketSize;                                    
                                                                                 
          // chaining                                                            
-         if (mTable[index].Key != Key)                                          
-         {                                                                      
-            if (mTable[index].Used)                                             
-            {                                                                   
+         if (mTable[index].Used)                                             
+         {                                                                   
+            if (mTable[index].Key != Key)                                          
+            {
                TKeyValuePair* prev = &mTable[index];                            
                TKeyValuePair* curr = mTable[index].Next;                        
                                                                                 
@@ -188,13 +188,13 @@ public:
                curr->Next = nullptr;                                            
                                                                                 
                return curr->Value;                                              
-            }                                                                   
-            else                                                                
-            {                                                                   
-               mTable[index].Key = Key;                                         
-               mTable[index].Used = true;                                       
-            }                                                                   
-         }                                                                      
+            }
+         }                                                                   
+         else                                                                
+         {                                                                   
+            mTable[index].Key = Key;                                         
+            mTable[index].Used = true;                                       
+         }                                                                   
       }                                                                         
                                                                                 
       return mTable[index].Value;                                               
