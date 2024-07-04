@@ -53,22 +53,38 @@ void MoveTail(Vector2* Head, Vector2* Tail)
    if (delta.X == 2)
    {
       Tail->X++;
-      Tail->Y += delta.Y;
+      //Tail->Y += delta.Y;
+      if (delta.Y >= 1)
+         Tail->Y++;
+      else if (delta.Y <= -1)
+         Tail->Y--;
    }
    else if (delta.X == -2)
    {
       Tail->X--;
-      Tail->Y += delta.Y;
+      //Tail->Y += delta.Y;
+      if (delta.Y >= 1)
+         Tail->Y++;
+      else if (delta.Y <= -1)
+         Tail->Y--;
    }
    else if (delta.Y == 2)
    {
       Tail->Y++;
-      Tail->X += delta.X;
+      //Tail->X += delta.X;
+      if (delta.X >= 1)
+         Tail->X++;
+      else if (delta.X <= -1)
+         Tail->X--;
    }
    else if (delta.Y == -2)
    {
       Tail->Y--;
-      Tail->X += delta.X;
+      //Tail->X += delta.X;
+      if (delta.X >= 1)
+         Tail->X++;
+      else if (delta.X <= -1)
+         Tail->X--;
    }
 }
 
@@ -103,15 +119,18 @@ void PrintPath(HashTable<Vector2, bool>& PosTable, Vector2 Min, Vector2 Max)
 
 void PrintState(Vector2* Pos)
 {
-   //const int min_y = 0;
-   //const int max_y = 4;
    //const int min_x = 0;
    //const int max_x = 5;
+   //const int min_y = 0;
+   //const int max_y = 4;
 
-   const int min_x = 0;
-   const int max_x = 5;
-   const int min_y = 0;
-   const int max_y = 4;
+   // test2.txt
+   // min (-11, -5) max (14, 15)
+
+   const int min_x = -11;
+   const int max_x = 14;
+   const int min_y = -5;
+   const int max_y = 15;
 
    const int tot_x = max_x-min_x+1;
    const int tot_y = max_y-min_y+1;
@@ -122,13 +141,13 @@ void PrintState(Vector2* Pos)
 
    memset(area, '.', sizeof(area));
 
-   //for (int i = NUM_KNOTS-1; i >= 0; i--)
-   //{
-   //   int tx = Pos[i].X - min_x;
-   //   int ty = Pos[i].Y - min_y;
-   //   int idx = (ty * tot_y) + tx;
-   //   area[idx] = knot[i];
-   //}
+   for (int i = NUM_KNOTS-1; i >= 0; i--)
+   {
+      int tx = Pos[i].X - min_x;
+      int ty = Pos[i].Y - min_y;
+      int idx = (ty * tot_x) + tx;
+      area[idx] = knot[i];
+   }
 
    printf("\n");
    for (int y = max_y; y >= min_y; y--)
@@ -136,8 +155,8 @@ void PrintState(Vector2* Pos)
       for (int x = min_x; x <= max_x; x++)
       {
          int tx = x - min_x;
-         int ty = x - min_y;
-         int idx = (ty * tot_y) + tx;
+         int ty = y - min_y;
+         int idx = (ty * tot_x) + tx;
          printf("%c", area[idx]);
       }
       printf("\n");
@@ -148,7 +167,7 @@ void PrintState(Vector2* Pos)
 int main()
 {
    HashTable<Vector2, bool> pos_table[NUM_KNOTS];
-   TBuffer                  file = ReadEntireFile("../test.txt");
+   TBuffer                  file = ReadEntireFile("../input.txt");
    Vector2                  pos[NUM_KNOTS];
    uint32_t                 total_moves = 0;
    Vector2                  min = { 10000, 10000 };
@@ -177,6 +196,8 @@ int main()
                num_moves *= 10;
                num_moves += file.Data[i++] - '0';
             }
+
+            //printf("== R %d ==\n", num_moves);
             
             for (int j = 0; j < num_moves; j++)
             {
@@ -193,7 +214,7 @@ int main()
                if (pos[0].Y < min.Y)
                   min.Y = pos[0].Y;
 
-               PrintState(pos);
+               //PrintState(pos);
 
                total_moves++;
             }
@@ -209,6 +230,8 @@ int main()
                num_moves *= 10;
                num_moves += file.Data[i++] - '0';
             }
+
+            //printf("== U %d ==\n", num_moves);
             
             for (int j = 0; j < num_moves; j++)
             {
@@ -225,7 +248,7 @@ int main()
                if (pos[0].Y < min.Y)
                   min.Y = pos[0].Y;
 
-               PrintState(pos);
+               //PrintState(pos);
 
                total_moves++;
             }
@@ -241,6 +264,8 @@ int main()
                num_moves *= 10;
                num_moves += file.Data[i++] - '0';
             }
+
+            //printf("== L %d ==\n", num_moves);
             
             for (int j = 0; j < num_moves; j++)
             {
@@ -257,7 +282,7 @@ int main()
                if (pos[0].Y < min.Y)
                   min.Y = pos[0].Y;
 
-               PrintState(pos);
+               //PrintState(pos);
 
                total_moves++;
             }
@@ -273,6 +298,8 @@ int main()
                num_moves *= 10;
                num_moves += file.Data[i++] - '0';
             }
+
+            //printf("== D %d ==\n", num_moves);
             
             for (int j = 0; j < num_moves; j++)
             {
@@ -289,7 +316,7 @@ int main()
                if (pos[0].Y < min.Y)
                   min.Y = pos[0].Y;
 
-               PrintState(pos);
+               //PrintState(pos);
 
                total_moves++;
             }
@@ -309,7 +336,7 @@ int main()
 
    printf("min (%d, %d) max (%d, %d)\n", min.X, min.Y, max.X, max.Y);
 
-   PrintPath(pos_table[NUM_KNOTS-1], min, max);
+   //PrintPath(pos_table[NUM_KNOTS-1], min, max);
 
    delete [] file.Data;
 }
