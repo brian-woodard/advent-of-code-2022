@@ -154,6 +154,43 @@ public:
       return size;                                                              
    }
 
+   V At(const K Key)
+   {
+      uint32_t index = 0;                                                       
+                                                                                
+      if (mHashFn)                                                              
+      {                                                                         
+         index = mHashFn(Key) % mBucketSize;                                    
+                                                                                
+         // chaining                                                            
+         if (mTable[index].Used)                                             
+         {                                                                   
+            if (mTable[index].Key != Key)                                          
+            {
+               TKeyValuePair* prev = &mTable[index];                            
+               TKeyValuePair* curr = mTable[index].Next;                        
+                                                                                
+               while (curr)                                                     
+               {                                                                
+                  if (curr->Key == Key)                                         
+                  {                                                             
+                     return curr->Value;                                        
+                  }                                                             
+                  prev = curr;                                                  
+                  curr = curr->Next;                                            
+               }                                                                
+                                                                                
+               prev->Next = new TKeyValuePair;                                  
+               curr = prev->Next;                                               
+                                                                                
+               return curr->Value;                                              
+            }
+         }                                                                   
+      }                                                                         
+                                                                                
+      return mTable[index].Value;                                               
+   }
+
    V& operator[](const K Key)                                                   
    {                                                                            
       uint32_t index = 0;                                                       
