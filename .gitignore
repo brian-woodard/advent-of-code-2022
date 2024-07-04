@@ -1,4 +1,5 @@
 *.exe
 main
+main_pt1
 **/target
 **/.vscode
