@@ -1,46 +1,6 @@
 
 #include <stdio.h>
-#include <stdint.h>
-#include <memory.h>
-#include <sys/stat.h>
-
-struct TBuffer
-{
-   uint8_t* Data;
-   uint32_t Count;
-};
-
-TBuffer ReadEntireFile(const char* FileName)
-{
-   TBuffer Result = {};
-
-   FILE *File = fopen(FileName, "rb");
-   if (File)
-   {
-      struct stat Stat;
-      stat(FileName, &Stat);
-
-      Result.Data = new uint8_t[Stat.st_size];
-      Result.Count = Stat.st_size;
-
-      if (Result.Data)
-      {
-         if (fread(Result.Data, Result.Count, 1, File) != 1)
-         {
-            fprintf(stderr, "ERROR: Unable to read \"%s\".\n", FileName);
-            delete [] Result.Data;
-         }
-      }
-
-      fclose(File);
-   }
-   else
-   {
-      fprintf(stderr, "ERROR: Unable to open \"%s\".\n", FileName);
-   }
-
-   return Result;
-}
+#include "Utility.h"
 
 int main()
 {
