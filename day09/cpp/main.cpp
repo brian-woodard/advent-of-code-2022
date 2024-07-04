@@ -338,5 +338,8 @@ int main()
 
    //PrintPath(pos_table[NUM_KNOTS-1], min, max);
 
+   printf("load factor: %f\n", pos_table[0].LoadFactor());
+   //pos_table[0].Print();
+
    delete [] file.Data;
 }
