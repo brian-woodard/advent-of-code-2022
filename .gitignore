@@ -1,4 +1,6 @@
 *.exe
+*.pdb
+*.obj
 main
 main_pt1
 **/target
