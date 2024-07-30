@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <vector>
 #include <string.h>
+#include <ctype.h>
 #include "Utility.h"
 
 enum TOperationType
@@ -47,16 +48,16 @@ struct TTest
 
 struct TMonkey
 {
-   int32_t          Monkey;
-   std::vector<int> Items;
-   TOperation       Operation;
-   TTest            Test;
-   int32_t          ItemsInspected;
+   int32_t               Monkey;
+   std::vector<uint64_t> Items;
+   TOperation            Operation;
+   TTest                 Test;
+   int32_t               ItemsInspected;
 };
 
 int main()
 {
-   TBuffer file = ReadEntireFile("../test.txt");
+   TBuffer file = ReadEntireFile("../input.txt");
    TMonkey monkey = {};
    std::vector<TMonkey> monkeys;
 
@@ -92,7 +93,7 @@ int main()
             {
                pos += 16;
 
-               int32_t item = file.Data[pos] - '0';
+               uint64_t item = file.Data[pos] - '0';
 
                while (file.Data[pos] != '\n' && file.Data[pos] != '\r')
                {
@@ -291,11 +292,14 @@ int main()
    // run over each monkey for some amount of rounds
    for (int round = 0; round < 20; round++)
    {
+      //printf("== Round %d ==================================================\n", round+1);
       for (int m = 0; m < monkeys.size(); m++)
       {
          for (int i = 0; i < monkeys[m].Items.size(); i++)
          {
             monkeys[m].ItemsInspected++;
+
+            //printf("r %d m %d i %d inspected %d item %llu -> ", round+1, m, i, monkeys[m].ItemsInspected, monkeys[m].Items[i]);
 
             switch (monkeys[m].Operation.Operation)
             {
@@ -327,7 +331,11 @@ int main()
                   break;
             }
 
+            //printf("%llu -> ", monkeys[m].Items[i]);
+
             monkeys[m].Items[i] /= 3;
+
+            //printf("%llu", monkeys[m].Items[i]);
 
             switch (monkeys[m].Test.Test)
             {
@@ -336,20 +344,30 @@ int main()
                   TMonkey& true_monkey = monkeys[monkeys[m].Test.ThrowTo[0]];
                   TMonkey& false_monkey = monkeys[monkeys[m].Test.ThrowTo[1]];
                   if (monkeys[m].Items[i] % monkeys[m].Test.Value == 0)
+                  {
                      true_monkey.Items.push_back(monkeys[m].Items[i]);
+                     //printf(" throw to %d", monkeys[m].Test.ThrowTo[0]);
+                  }
                   else
+                  {
                      false_monkey.Items.push_back(monkeys[m].Items[i]);
+                     //printf(" throw to %d", monkeys[m].Test.ThrowTo[1]);
+                  }
 
                   break;
                }
                default:
                   break;
             }
+
+            //printf("\n");
          }
 
          // monkey inspected and threw all  items
          monkeys[m].Items.clear();
       }
+
+      //printf("\n");
    }
 
    int32_t max[2] = { 0 };
@@ -357,7 +375,7 @@ int main()
    // print item list of all monkeys
    for (int m = 0; m < monkeys.size(); m++)
    {
-      printf("Monkey %d: ", monkeys[m].Monkey);
+      printf("Monkey %d (inspected %d items): ", monkeys[m].Monkey, monkeys[m].ItemsInspected);
       for (int i = 0; i < monkeys[m].Items.size(); i++)
       {
          printf("%d", monkeys[m].Items[i]);
@@ -370,6 +388,10 @@ int main()
       {
          max[1] = max[0];
          max[0] = monkeys[m].ItemsInspected;
+      }
+      else if (monkeys[m].ItemsInspected > max[1])
+      {
+         max[1] = monkeys[m].ItemsInspected;
       }
    }
 
